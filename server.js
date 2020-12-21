@@ -39,12 +39,24 @@ var server = http.createServer(function(request, response){
         response.end(`{"errorCode":4001}`)
       }else{
         response.statusCode=200
+        response.setHeader('Set-Cookie','logined=1')
         response.end()
       }
     })
-  }else if(path==='./home.html'){
+  }else if(path==='/home.html'){
     //写不出来
-    request.end('home')
+    //读取cookie
+    const cookie =request.headers['cookie']
+    console.log(cookie)
+    if(cookie==='logined=1'){
+      const homeHtml= fs.readFileSync("./public/home.html").toString()
+      const stringH= homeHtml.replace('{{loginStatus}}','已登录')
+      response.write(stringH)
+    }else{
+      const homeHtml= fs.readFileSync("./public/home.html").toString()
+      const stringH= homeHtml.replace('{{loginStatus}}','未登录')
+      response.write(stringH)
+    }
   }else if(path==='/register'&& method==='POST'){
     response.setHeader('Content-Type','text/html;  charset=UTF-8')
     const userArray = JSON.parse(fs.readFileSync('./db/users.json'))
