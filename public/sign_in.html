@@ -3,13 +3,13 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-        content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-    <title>注册</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登录页面</title>
 </head>
 
 <body>
-    <form id="registerForm">
+    <h1 style="color:red;">登录页面</h1>
+    <form id="signInForm">
         <div>
             <label>用户名 <input type="text" name="name"></label>
         </div>
@@ -17,13 +17,13 @@
             <label>密码 <input type="current-password" name="password"></label>
         </div>
         <div>
-            <button type="submit">注册</button>
+            <button type="submit">登录</button>
         </div>
     </form>
     <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script>
-        const $form = $('#registerForm')
-        $('#registerForm').on('submit', (e) => {
+        const $form = $('#signInForm')
+        $('#signInForm').on('submit', (e) => {
             e.preventDefault()
             // 监听他的submit事件，然后阻止他的默认事件，养成这个好习惯
             let name = $form.find('input[name=name]').val()
@@ -31,19 +31,18 @@
             console.log(name, password)
             $.ajax({
                 method: 'POST',
-                url: '/register',
+                url: '/sign_in',
                 contentType: 'text/json; charset=UTF-8',
                 data: JSON.stringify({ name, password })
             }).then(() => {
-                alert('注册成功')
+                alert('登录成功')
                 //window.open()
-                location.href = '/sign_in.html'
+                location.href = '/home.html'
             }, () => {
 
             })
         })
     </script>
-
 </body>
 
 </html>

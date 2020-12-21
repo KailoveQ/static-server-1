@@ -1,6 +1,7 @@
 var http = require('http')
 var fs = require('fs')
 var url = require('url')
+const { sign } = require('crypto')
 var port = process.argv[2]
 
 if(!port){
@@ -19,11 +20,34 @@ var server = http.createServer(function(request, response){
   /******** 从这里开始看，上面不要看 ************/
 
   console.log('有个傻子发请求过来啦！路径（带查询参数）为：' + pathWithQuery)
-
-  if(path==='/register'&& method==='POST'){
+  if(path === '/sign_in' && method==='POST'){
     response.setHeader('Content-Type','text/html;  charset=UTF-8')
     const userArray = JSON.parse(fs.readFileSync('./db/users.json'))
-    console.log(userArray)
+    const array=[]
+    request.on('data',(chunk)=>{
+      array.push(chunk)
+    })
+    request.on('end',(e)=>{
+      const string = Buffer.concat(array).toString()
+      const obj=JSON.parse(string)
+      const user=userArray.find((user)=>user.name===obj.name && 
+      user.password===obj.password)
+      //console.log(user)
+      if(user===undefined){
+        response.statusCode=400
+        response.setHeader('Content-Type','text/json;  charset=UTF-8')
+        response.end(`{"errorCode":4001}`)
+      }else{
+        response.statusCode=200
+        response.end()
+      }
+    })
+  }else if(path==='./home.html'){
+    //写不出来
+    request.end('home')
+  }else if(path==='/register'&& method==='POST'){
+    response.setHeader('Content-Type','text/html;  charset=UTF-8')
+    const userArray = JSON.parse(fs.readFileSync('./db/users.json'))
     const array=[]
     request.on('data',(chunk)=>{
       array.push(chunk)
@@ -39,20 +63,18 @@ var server = http.createServer(function(request, response){
           password:obj.password
         }
       userArray.push(newUser)
-      console.log(userArray)
       fs.writeFileSync('./db/users.json',JSON.stringify(userArray))
       response.end('')
     })
-
   }else{
     response.statusCode = 200
     //默认首页
     const filePath = path==='/'?'/index.html' : path
     const index =filePath.lastIndexOf('.')
-    console.log(filePath.lastIndexOf('.'))
+    //console.log(filePath.lastIndexOf('.'))
     //suffix是后缀
     const suffix=filePath.substring(index)
-    console.log(suffix)
+    //console.log(suffix)
     const fileTypes={
           '.html':'text/html',
           '.css':'text/css',
